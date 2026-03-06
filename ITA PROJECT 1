@@ -1,0 +1,67 @@
+from sklearn.metrics import accuracy_score, f1_score
+import pandas as pd
+
+# Dictionary to store performance without anomaly features
+model_performance_no_anomaly = {}
+
+# --- Decision Tree Model Evaluation (without anomaly features) ---
+print('\n--- Decision Tree Classifier Evaluation (without anomaly features) ---')
+dt_accuracy_no_anomaly = accuracy_score(y_test_no_anomaly, y_pred_dt_no_anomaly)
+print(f'Accuracy: {dt_accuracy_no_anomaly:.4f}')
+dt_f1_no_anomaly = f1_score(y_test_no_anomaly, y_pred_dt_no_anomaly, average='weighted')
+print(f'F1-score (weighted): {dt_f1_no_anomaly:.4f}')
+model_performance_no_anomaly['Decision Tree'] = {'Accuracy': dt_accuracy_no_anomaly, 'F1-score': dt_f1_no_anomaly}
+
+# --- XGBoost Model Evaluation (without anomaly features) ---
+print('\n--- XGBoost Classifier Evaluation (without anomaly features) ---')
+xgb_accuracy_no_anomaly = accuracy_score(y_test_no_anomaly, y_pred_xgb_no_anomaly)
+print(f'Accuracy: {xgb_accuracy_no_anomaly:.4f}')
+xgb_f1_no_anomaly = f1_score(y_test_no_anomaly, y_pred_xgb_no_anomaly, average='weighted')
+print(f'F1-score (weighted): {xgb_f1_no_anomaly:.4f}')
+model_performance_no_anomaly['XGBoost'] = {'Accuracy': xgb_accuracy_no_anomaly, 'F1-score': xgb_f1_no_anomaly}
+
+# --- Neural Network (MLP) Model Evaluation (without anomaly features) ---
+print('\n--- Neural Network (MLP) Classifier Evaluation (without anomaly features) ---')
+mlp_accuracy_no_anomaly = accuracy_score(y_test_no_anomaly, y_pred_mlp_no_anomaly)
+print(f'Accuracy: {mlp_accuracy_no_anomaly:.4f}')
+mlp_f1_no_anomaly = f1_score(y_test_no_anomaly, y_pred_mlp_no_anomaly, average='weighted')
+print(f'F1-score (weighted): {mlp_f1_no_anomaly:.4f}')
+model_performance_no_anomaly['Neural Network'] = {'Accuracy': mlp_accuracy_no_anomaly, 'F1-score': mlp_f1_no_anomaly}
+
+# --- Compare Performance --- (assuming model_performance from previous step is available)
+print('\n--- Comparison of Model Performance (With vs. Without Anomaly Features) ---')
+
+performance_with_anomaly_df = pd.DataFrame(model_performance).T
+performance_with_anomaly_df.columns = ['Accuracy_With_Anomaly', 'F1-score_With_Anomaly']
+
+performance_no_anomaly_df = pd.DataFrame(model_performance_no_anomaly).T
+performance_no_anomaly_df.columns = ['Accuracy_No_Anomaly', 'F1-score_No_Anomaly']
+
+# Concatenate for easy comparison
+comparison_df = pd.concat([performance_with_anomaly_df, performance_no_anomaly_df], axis=1)
+print(comparison_df)
+
+print('\n--- Observations on Anomaly Detection Impact ---')
+# Detailed observations based on the comparison_df can be added here programmatically or manually after reviewing.
+# For example, identify models where accuracy or f1-score changed significantly.
+
+for model_name in comparison_df.index:
+    acc_with = comparison_df.loc[model_name, 'Accuracy_With_Anomaly']
+    acc_no = comparison_df.loc[model_name, 'Accuracy_No_Anomaly']
+    f1_with = comparison_df.loc[model_name, 'F1-score_With_Anomaly']
+    f1_no = comparison_df.loc[model_name, 'F1-score_No_Anomaly']
+
+    print(f'\nModel: {model_name}')
+    if acc_with > acc_no:
+        print(f' - Accuracy slightly better WITH anomaly features ({acc_with:.4f} vs {acc_no:.4f}).')
+    elif acc_no > acc_with:
+        print(f' - Accuracy slightly better WITHOUT anomaly features ({acc_no:.4f} vs {acc_with:.4f}).')
+    else:
+        print(f' - Accuracy is similar WITH and WITHOUT anomaly features ({acc_with:.4f}).')
+
+    if f1_with > f1_no:
+        print(f' - F1-score slightly better WITH anomaly features ({f1_with:.4f} vs {f1_no:.4f}).')
+    elif f1_no > f1_with:
+        print(f' - F1-score slightly better WITHOUT anomaly features ({f1_no:.4f} vs {f1_with:.4f}).')
+    else:
+        print(f' - F1-score is similar WITH and WITHOUT anomaly features ({f1_with:.4f}).')
